@@ -151,10 +151,25 @@ export default function LoginPage() {
               </CardHeader>
               <CardContent>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-8">
-                    <TabsTrigger value="login">登录</TabsTrigger>
-                    <TabsTrigger value="register">注册</TabsTrigger>
-                    <TabsTrigger value="reset">重置密码</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 mb-8 bg-black/50 border border-purple-500/30">
+                     <TabsTrigger
+                      value="login"
+                      className="text-white data-[state=active]:bg-purple-700 data-[state=active]:text-white transition-all duration-300"
+                    >
+                      登录
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="register"
+                      className="text-white data-[state=active]:bg-purple-700 data-[state=active]:text-white transition-all duration-300"
+                    >
+                      注册
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="reset"
+                      className="text-white data-[state=active]:bg-purple-700 data-[state=active]:text-white transition-all duration-300"
+                    >
+                      重置密码
+                    </TabsTrigger>
                   </TabsList>
                   <div className="mt-4">
                     <div className="flex justify-center space-x-4 mb-6">

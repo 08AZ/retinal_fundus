@@ -28,7 +28,7 @@ export default function Navbar() {
       <Link href="/" className="flex items-center space-x-3">
         {/* Simple logo container */}
         <div className="relative w-20 h-20">
-          <Image src="/images/logo.png" alt="致用智联 Logo" fill className="object-contain" />
+          <Image src="/images/logo2.png" alt="致用智联 Logo" fill className="object-contain" />
         </div>
         <span className="text-white font-medium text-xl">致用智联</span>
       </Link>
