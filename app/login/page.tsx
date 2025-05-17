@@ -23,7 +23,7 @@ const buttonVariants = {
   visible: { opacity: 1, scale: 1 },
 }
 const getCsrfToken = async () => {
-  const response = await fetch("http://localhost:8000/csrf-token/",{
+  const response = await fetch("http://101.37.38.7:8002/csrf-token/",{
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -40,7 +40,10 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const router = useRouter()
   const { login, isAuthenticated } = useAuth()
-
+  function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
   // 如果用户已登录，重定向到首页
   useEffect(() => {
     if (isAuthenticated) {
@@ -56,26 +59,39 @@ export default function LoginPage() {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData)
-    const csrfToken=await getCsrfToken()
-    localStorage.setItem("csrfToken", csrfToken)
+    //let csrfToken=await getCsrfToken()
+    let csrfToken: string | null =""
+    if(getCookie("csrftoken")) {
+      csrfToken=getCookie("csrftoken")
+      alert("GETCOOKIES")
+    }
+    else {
+      alert("No Csrf Token,fuck!!")
+      /*csrfToken = await getCsrfToken()*/
+    }
+    if(csrfToken) {
+      localStorage.setItem("csrfToken", csrfToken)
+    }
     try {
       let url = ""
       if (activeTab === "login") {
-        url = "http://localhost:8000/login/"
+        url = "http://101.37.38.7:8002/login/"
       } else if (activeTab === "register") {
-        url = "http://localhost:8000/register/"
+        url = "http://101.37.38.7:8002/register/"
       } else {
-        url = "http://localhost:8000/reset_password/"
+        url = "http://101.37.38.7:8002/reset_password/"
       }
-
+      const headers: HeadersInit = {};
+      const csrfToken = getCookie("csrftoken");
+      if (csrfToken) {
+        headers["X-CSRFToken"] = csrfToken;
+        headers["Accept"] = "application/json"
+      }
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken
-        },
+        headers: headers,
         body: JSON.stringify({ ...data, way: loginMethod }),
-        credentials: "include"
+        //credentials: "include"
       })
 
       if (response.ok) {
