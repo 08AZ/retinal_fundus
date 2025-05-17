@@ -32,6 +32,10 @@ export default function ProcessingPage() {
   const count = Number.parseInt(searchParams.get("count") || "1")
   const [ids, setIds] = useState<Array<number>|null>(null);
   const id=searchParams.get("id")
+  function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
   useEffect(() => {
     const fetchProgress = async () => {
       try {
@@ -45,23 +49,23 @@ export default function ProcessingPage() {
         }
         try {
         const headers: HeadersInit = {};
-        const csrfToken=localStorage.getItem("csrfToken");
+        const csrfToken=getCookie("csrftoken");
 // 如果 csrfToken 存在，才将其添加到 headers 中
       if (csrfToken) {
       headers["X-CSRFToken"] = csrfToken;
       }
-        const response = await fetch("http://localhost:8000/progress/",{
+        const response = await fetch("http://101.37.38.7:8002/progress/",{
           method: "POST",
           body:JSON.stringify({
             "ids":ids,
             "task_id":id,
+            "user_id":localStorage.getItem("user_id")
               }
               ),
           headers:headers,
           credentials: "include",
         })
         if (response.ok) {
-          console.log(response.body)
           const data = await response.json()
           setProgress(data.progress)
           if (data.progress === 100) {
@@ -92,7 +96,9 @@ export default function ProcessingPage() {
     setCurrentPage((prev) => (prev < results.length - 1 ? prev + 1 : prev))
   }
 
-  const currentResult = results[currentPage]
+  const currentResult = results[currentPage];  // 获取当前页数据
+
+
 
   return (
     <main className="min-h-screen bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
@@ -184,7 +190,7 @@ export default function ProcessingPage() {
                             <p className="text-gray-400 mb-2 text-sm">原始图像</p>
                             <div className="relative aspect-square bg-black/30 rounded-lg overflow-hidden">
                               <img
-                                src={currentResult.originalImage || "/placeholder.svg"}
+                                src={ `data:image/png;base64,${currentResult.originalImage}`|| "/placeholder.svg"}
                                 alt="原始图像"
                                 className="w-full h-full object-contain"
                               />
@@ -194,7 +200,7 @@ export default function ProcessingPage() {
                             <p className="text-gray-400 mb-2 text-sm">预处理图像</p>
                             <div className="relative aspect-square bg-black/30 rounded-lg overflow-hidden">
                               <img
-                                src={currentResult.processedImage || "/placeholder.svg"}
+                                src={`data:image/jpg;base64,${currentResult.processedImage}` || "/placeholder.svg"}
                                 alt="预处理图像"
                                 className="w-full h-full object-contain"
                               />
@@ -227,7 +233,7 @@ export default function ProcessingPage() {
 
                         <div className="h-64">
                           <p className="text-gray-400 mb-2 text-sm">疾病概率分布</p>
-                          <PieChart data={currentResult.probabilities} />
+                          <PieChart data1={currentResult.probabilities} />
                         </div>
 
                         <div className="flex gap-2 mt-6">
