@@ -42,7 +42,10 @@ export function FileUpload() {
       fileInputRef.current.click()
     }
   }
-
+  function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
   const handleSubmit = async () => {
     // 检查用户是否已登录
     if (!checkAuth()) {
@@ -64,15 +67,26 @@ export function FileUpload() {
       formData.append("files", file)
     })
 
+
     try {
       const headers: HeadersInit = {};
-       const csrfToken=localStorage.getItem("csrfToken");
+      const csrfToken = getCookie('csrftoken'); // 始终从 cookie 获取最新的 token
 // 如果 csrfToken 存在，才将其添加到 headers 中
       if (csrfToken) {
       headers["X-CSRFToken"] = csrfToken;
+      headers["Accept"] = "application/json"
+      }
+      else{
+        console.log("no csrf")
+        console.log(location.protocol);
       }
       console.log(headers);
-      const response = await fetch("http://localhost:8000/upload/", {
+      let user_id;
+      user_id=localStorage.getItem("user_id");
+      if (user_id) {
+        formData.append("user_id", user_id);
+      }
+      const response = await fetch("http://101.37.38.7:8002/upload/", {
         method: "POST",
         body: formData,
         headers:headers,
@@ -84,6 +98,7 @@ export function FileUpload() {
         // 传递文件数量到处理页面
         router.push(`/processing?id=${result["task_id"]}&count=${files.length}`)
       } else {
+        console.log(response)
         throw new Error("Upload failed")
       }
     } catch (error) {

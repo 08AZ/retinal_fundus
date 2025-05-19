@@ -23,6 +23,10 @@ type Diagnosis = {
 const sampleDiagnoses = [
   // ... your sample data here
 ]
+function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
 
 export default function HistoricalDiagnoses() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -33,22 +37,20 @@ export default function HistoricalDiagnoses() {
   const fetchDiagnoses = async () => {
     try {
       const headers: HeadersInit = {};
-      const csrfToken = localStorage.getItem("csrfToken");
-      if (csrfToken) {
-        headers["X-CSRFToken"] = csrfToken;
-        headers["Accept"] = "application/json"
-
-        const user_id = localStorage.getItem("user_id");
-        const response = await fetch("http://localhost:8000/diagnoses/", {
-          body: JSON.stringify({ user_id: user_id }),
-          method: "POST",
-          headers: headers,
-          credentials: "include"
-        })
+      headers["Accept"] = "application/json"
+      headers['Content-Type']= 'application/json'
+      const user_id = localStorage.getItem("user_id");
+      const response = await fetch("http://101.37.38.7:8002/diagnoses/", {
+        body: JSON.stringify({ user_id: user_id }),
+        method: "POST",
+        headers: headers,
+        credentials: "include"
+      })
         const diagnoses = await response.json();
         setDiagnoses(diagnoses);
         console.log(diagnoses);
-      }
+
+
     } catch (error) {
       console.error(error)
     }
@@ -85,9 +87,9 @@ export default function HistoricalDiagnoses() {
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     <div className="relative w-full md:w-64 h-48 md:h-auto">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 z-10"/>
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 z-10"/>
                       <img
-                        src={diagnosis.image || "/placeholder.svg"}
+                        src={`data:image/png;base64,${diagnosis.image}` || "/placeholder.svg"}
                         alt={`Retinal scan for ${diagnosis.diagnosis}`}
                         className="w-full h-full object-cover"
                       />

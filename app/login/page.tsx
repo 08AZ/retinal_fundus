@@ -60,18 +60,6 @@ export default function LoginPage() {
     const formData = new FormData(event.currentTarget)
     const data = Object.fromEntries(formData)
     //let csrfToken=await getCsrfToken()
-    let csrfToken: string | null =""
-    if(getCookie("csrftoken")) {
-      csrfToken=getCookie("csrftoken")
-      alert("GETCOOKIES")
-    }
-    else {
-      alert("No Csrf Token,fuck!!")
-      /*csrfToken = await getCsrfToken()*/
-    }
-    if(csrfToken) {
-      localStorage.setItem("csrfToken", csrfToken)
-    }
     try {
       let url = ""
       if (activeTab === "login") {
@@ -82,11 +70,6 @@ export default function LoginPage() {
         url = "http://101.37.38.7:8002/reset_password/"
       }
       const headers: HeadersInit = {};
-      const csrfToken = getCookie("csrftoken");
-      if (csrfToken) {
-        headers["X-CSRFToken"] = csrfToken;
-        headers["Accept"] = "application/json"
-      }
       const response = await fetch(url, {
         method: "POST",
         headers: headers,
